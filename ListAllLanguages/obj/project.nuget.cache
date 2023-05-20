@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "qAWOKFuZZ6Rk/BkdCcVKn0AD6rdIUb+odKzu3ZRDZXIyFx1+E8aBrGS/vZOCf/RKepYNfCntz3uTQf9afQ21LA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Michael\\source\\2048-in-every-programming-language\\ListAllLanguages\\ListAllLanguages.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Michael\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.16\\microsoft.windowsdesktop.app.ref.6.0.16.nupkg.sha512",
+    "C:\\Users\\Michael\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.16\\microsoft.netcore.app.ref.6.0.16.nupkg.sha512",
+    "C:\\Users\\Michael\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.16\\microsoft.aspnetcore.app.ref.6.0.16.nupkg.sha512",
+    "C:\\Users\\Michael\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\6.0.16\\microsoft.netcore.app.host.win-x64.6.0.16.nupkg.sha512"
+  ],
+  "logs": []
+}

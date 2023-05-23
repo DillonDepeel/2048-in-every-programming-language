@@ -2,6 +2,7 @@
 trying to make 2048 in 2048 languages! feel free to add 2048 in every programming language that you know!
 ## A
 * Aarch64 Assembly
+* ActionScript
 * Ada
 * ALGOL 68
 * Amazing Hopper
@@ -91,6 +92,7 @@ trying to make 2048 in 2048 languages! feel free to add 2048 in every programmin
 * Tcl
 ## U
 ## V
+* V
 * Visual Basic
 ## W
 * Wren

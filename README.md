@@ -100,3 +100,4 @@ trying to make 2048 in 2048 languages! feel free to add 2048 in every programmin
 * XPLo
 ## Y
 ## Z
+* ZenScript

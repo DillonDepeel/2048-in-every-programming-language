@@ -1,7 +1,7 @@
 # 2048-in-every-programming-language
 trying to make 2048 in 2048 languages! feel free to add 2048 in every programming language that you know! 
 ## Languages
-we have written 2048 in 88 languages including the following:
+we have written 2048 in 89 languages including the following:
 ## A
 * Aarch64 Assembly
 * ABAP
@@ -42,6 +42,7 @@ we have written 2048 in 88 languages including the following:
 * Free BASIC
 ## G
 * Go
+* Groovy
 ## H
 * Haskell
 * HTML

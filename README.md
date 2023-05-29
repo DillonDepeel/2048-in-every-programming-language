@@ -69,6 +69,7 @@ we have written 2048 in 87 languages including the following:
 ## O
 * Objective-C
 * OCaml
+* Ook!
 ## P
 * Pascal
 * Perl

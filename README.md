@@ -96,6 +96,7 @@ we have written 2048 in 92 languages including the following:
 * Ruby
 * Rust
 ## S
+* SAS
 * Scala
 * Seed7
 * SQL

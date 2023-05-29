@@ -1,0 +1,184 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Game}
+\lhead{2048}
+\rfoot{Page \thepage}
+
+\setlength{\parindent}{0pt}
+
+\newcommand{\twist}[1]{
+    \def\tempa{#1}
+    \def\tempb{#1}
+    \foreach \i in {1,...,4}{
+        \foreach \j in {1,...,4}{
+            \pgfmathtruncatemacro{\x}{\i-1}
+            \pgfmathtruncatemacro{\y}{\j-1}
+            \pgfmathtruncatemacro{\tempb}{\tempa[\y][\x]}
+            \global\let\tempa[\i][\j]\tempb
+        }
+    }
+    \global\let#1\tempa
+}
+
+\newcommand{\flip}[1]{
+    \def\tempa{#1}
+    \def\tempb{#1}
+    \foreach \i in {1,...,4}{
+        \foreach \j in {1,...,4}{
+            \pgfmathtruncatemacro{\y}{\j-1}
+            \pgfmathtruncatemacro{\tempb}{\tempa[\i][4-\y]}
+            \global\let\tempa[\i][\j]\tempb
+        }
+    }
+    \global\let#1\tempa
+}
+
+\newcommand{\fall}[1]{
+    \def\tempa{#1}
+    \def\tempb{#1}
+    \foreach \i in {1,...,4}{
+        \foreach \j in {1,...,4}{
+            \pgfmathtruncatemacro{\y}{\j-1}
+            \pgfmathtruncatemacro{\x}{\i-1}
+            \pgfmathtruncatemacro{\prev}{0}
+            \pgfmathtruncatemacro{\jnew}{0}
+            \foreach \k in {1,...,4}{
+                \pgfmathtruncatemacro{\ynew}{\k-1}
+                \pgfmathtruncatemacro{\temp}{\tempa[\i][\k]}
+                \ifnum\temp>0
+                    \ifnum\temp=\prev
+                        \pgfmathtruncatemacro{\tempb[\i][\jnew-1]}{\prev*2}
+                        \pgfmathtruncatemacro{\prev}{0}
+                    \else
+                        \pgfmathtruncatemacro{\tempb[\i][\jnew]}{\temp}
+                        \pgfmathtruncatemacro{\prev}{\temp}
+                        \pgfmathtruncatemacro{\jnew}{\jnew+1}
+                    \fi
+                \fi
+            }
+            \foreach \k in {\jnew,...,3}{
+                \pgfmathtruncatemacro{\tempb[\i][\k]}{0}
+            }
+        }
+    }
+    \global\let#1\tempb
+}
+
+\newcommand{\popup}[1]{
+    \def\tempa{#1}
+    \def\tempb{#1}
+    \pgfmathtruncatemacro{\i}{random(0,3)}
+    \pgfmathtruncatemacro{\j}{random(0,3)}
+    \pgfmathtruncatemacro{\temp}{\tempa[\i][\j]}
+    \ifnum\temp=0
+        \pgfmathtruncatemacro{\tempb[\i][\j]}{ifthenelse(random(0,9)>0,2,4)}
+        \global\let#1\tempb
+    \else
+        \popup{#1}
+    \fi
+}
+
+\newcommand{\beginning}[1]{
+    \def\tempa{#1}
+    \def\tempb{#1}
+    \foreach \i in {1,...,2}{
+        \pgfmathtruncatemacro{\x}{random(0,3)}
+        \pgfmathtruncatemacro{\y}{random(0,3)}
+        \pgfmathtruncatemacro{\tempb[\x][\y]}{ifthenelse(random(0,9)>0,2,4)}
+    }
+    \global\let#1\tempb
+}
+
+\newcommand{\same}[2]{
+    \def\tempa{#1}
+    \def\tempb{#2}
+    \foreach \i in {1,...,4}{
+        \foreach \j in {1,...,4}{
+            \pgfmathtruncatemacro{\temp}{\tempa[\i][\j]==\tempb[\i][\j]}
+            \ifnum\temp=0
+                \global\let\result{0}
+                \return
+            \fi
+        }
+    }
+    \global\let\result{1}
+}
+
+\newcommand{\tryfalling}[1]{
+    \def\tempa{#1}
+    \def\tempb{#1}
+    \fall{\tempa}
+    \same{\tempa}{\tempb}
+    \ifnum\result=0
+        \global\let\result{1}
+    \else
+        \global\let\result{0}
+    \fi
+}
+
+\newcommand{\move}[2]{
+    \def\tempa{#1}
+    \def\tempb{#1}
+    \ifnum#2=0
+        \twist{\tempa}
+    \fi
+    \ifnum#2=1
+        \flip{\tempa}
+    \fi
+    \ifnum#2=2
+        \twist{\tempa}
+        \flip{\tempa}
+    \fi
+    \ifnum#2=3
+        \flip{\tempa}
+        \twist{\tempa}
+    \fi
+    \tryfalling{\tempa}
+    \ifnum\result=1
+        \popup{\tempa}
+    \fi
+    \ifnum#2=1
+        \flip{\tempa}
+    \fi
+    \ifnum#2=0
+        \twist{\tempa}
+    \fi
+    \ifnum#2=2
+        \flip{\tempa}
+        \twist{\tempa}
+    \fi
+    \ifnum#2=3
+        \twist{\tempa}
+        \flip{\tempa}
+    \fi
+    \global\let#1\tempa
+}
+
+\newcommand{\print}[1]{
+    \def\tempa{#1}
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        \tempa[1][4] & \tempa[2][4] & \tempa[3][4] & \tempa[4][4] \\
+        \hline
+        \tempa[1][3] & \tempa[2][3] & \tempa[3][3] & \tempa[4][3] \\
+        \hline
+        \tempa[1][2] & \tempa[2][2] & \tempa[3][2] & \tempa[4][2] \\
+        \hline
+        \tempa[1][1] & \tempa[2][1] & \tempa[3][1] & \tempa[4][1] \\
+        \hline
+    \end{tabular}
+}
+
+\begin{document}
+
+\beginning{\tiles}
+\print{\tiles}
+
+\end{document}

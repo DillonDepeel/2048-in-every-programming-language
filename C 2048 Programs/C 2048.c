@@ -1,279 +1,191 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <ctype.h>
 #include <termios.h>
-#include <time.h>
 #include <unistd.h>
 
-#define D_INVALID -1
-#define D_UP       1
-#define D_DOWN     2
-#define D_RIGHT    3
-#define D_LEFT     4
+#define SIZE 4
 
-const long values[] = {
-    0, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048
+struct game {
+	int tiles[SIZE][SIZE];
 };
 
-const char *colors[] = {
-    "39", "31", "32", "33", "34", "35", "36", "37", "91", "92", "93", "94"
+enum {
+	DOWN,
+	UP,
+	LEFT,
+	RIGHT,
+	MOVES
 };
 
-struct gamestate_struct__ {
-    int grid[4][4];
-    int have_moved;
-    long total_score;
-    long score_last_move;
-    int blocks_in_play;
-} game;
-
-struct termios oldt, newt;
-
-void do_draw(void)
+int random_spot(struct game* g)
 {
-    printf("\033[2J\033[HScore: %ld", game.total_score);
-    if (game.score_last_move)
-        printf(" (+%ld)", game.score_last_move);
-    printf("\n");
-
-    for (int i = 0; i < 25; ++i)
-        printf("-");
-    printf("\n");
-
-    for (int y = 0; y < 4; ++y) {
-        printf("|");
-        for (int x = 0; x < 4; ++x) {
-            if (game.grid[x][y])
-                printf("\033[7m\033[%sm%*zd \033[0m|", colors[game.grid[x][y]],
-                        4, values[game.grid[x][y]]);
-            else
-                printf("%*s |", 4, "");
-        }
-        printf("\n");
-    }
-
-    for (int i = 0; i < 25; ++i) {
-        printf("-");
-    }
-    printf("\n");
+	return rand() % SIZE;
 }
 
-void do_merge(int d)
+int random_value(struct game* g)
 {
-/* These macros look pretty scary, but mainly demonstrate some space saving */
-#define MERGE_DIRECTION(_v1, _v2, _xs, _xc, _xi, _ys, _yc, _yi, _x, _y)     \
-    do {                                                                    \
-        for (int _v1 = _xs; _v1 _xc; _v1 += _xi) {                          \
-            for (int _v2 = _ys; _v2 _yc; _v2 += _yi) {                      \
-                if (game.grid[x][y] && (game.grid[x][y] ==                  \
-                                    game.grid[x + _x][y + _y])) {           \
-                    game.grid[x][y] += (game.have_moved = 1);               \
-                    game.grid[x + _x][y + _y] = (0 * game.blocks_in_play--);\
-                    game.score_last_move += values[game.grid[x][y]];        \
-                    game.total_score += values[game.grid[x][y]];            \
-                }                                                           \
-            }                                                               \
-        }                                                                   \
-    } while (0)
-
-    game.score_last_move = 0;
-
-    switch (d) {
-        case D_LEFT:
-            MERGE_DIRECTION(x, y, 0, < 3, 1, 0, < 4, 1, 1, 0);
-            break;
-        case D_RIGHT:
-            MERGE_DIRECTION(x, y, 3, > 0, -1, 0, < 4, 1, -1, 0);
-            break;
-        case D_DOWN:
-            MERGE_DIRECTION(y, x, 3, > 0, -1, 0, < 4, 1, 0, -1);
-            break;
-        case D_UP:
-            MERGE_DIRECTION(y, x, 0, < 3, 1, 0, < 4, 1, 0, 1);
-            break;
-    }
-
-#undef MERGE_DIRECTION
+	return (rand() % 10) ? 2 : 4;
 }
 
-void do_gravity(int d)
+void print(struct game* g)
 {
-#define GRAVITATE_DIRECTION(_v1, _v2, _xs, _xc, _xi, _ys, _yc, _yi, _x, _y) \
-    do {                                                                    \
-        int break_cond = 0;                                                 \
-        while (!break_cond) {                                               \
-            break_cond = 1;                                                 \
-            for (int _v1 = _xs; _v1 _xc; _v1 += _xi) {                      \
-                for (int _v2 = _ys; _v2 _yc; _v2 += _yi) {                  \
-                    if (!game.grid[x][y] && game.grid[x + _x][y + _y]) {    \
-                        game.grid[x][y] = game.grid[x + _x][y + _y];        \
-                        game.grid[x + _x][y + _y] = break_cond = 0;         \
-                        game.have_moved = 1;                                \
-                    }                                                       \
-                }                                                           \
-            }                                                               \
-            do_draw(); usleep(40000);                                       \
-        }                                                                   \
-    } while (0)
-
-    switch (d) {
-        case D_LEFT:
-            GRAVITATE_DIRECTION(x, y, 0, < 3, 1, 0, < 4, 1, 1, 0);
-            break;
-        case D_RIGHT:
-            GRAVITATE_DIRECTION(x, y, 3, > 0, -1, 0, < 4, 1, -1, 0);
-            break;
-        case D_DOWN:
-            GRAVITATE_DIRECTION(y, x, 3, > 0, -1, 0, < 4, 1, 0, -1);
-            break;
-        case D_UP:
-            GRAVITATE_DIRECTION(y, x, 0, < 3, 1, 0, < 4, 1, 0, 1);
-            break;
-    }
-
-#undef GRAVITATE_DIRECTION
+	int i,j;
+	printf("--------------------------\n");
+	for (j = SIZE - 1; j >= 0; --j) {
+		printf("|");
+		for (i = 0; i < SIZE; ++i) {
+			if (g->tiles[i][j])
+				printf("%4d  ", g->tiles[i][j]);
+			else
+				printf("      ");
+		}
+		printf("|\n");
+	}
+	printf("--------------------------\n");
 }
 
-int do_check_end_condition(void)
+void twist(struct game* g)
 {
-    int ret = -1;
-    for (int x = 0; x < 4; ++x) {
-        for (int y = 0; y < 4; ++y) {
-            if (values[game.grid[x][y]] == 2048)
-                return 1;
-            if (!game.grid[x][y] ||
-                  ((x + 1 < 4) && (game.grid[x][y] == game.grid[x + 1][y])) ||
-                  ((y + 1 < 4) && (game.grid[x][y] == game.grid[x][y + 1])))
-                ret = 0;
-        }
-    }
-    return ret;
+	int i,j;
+	struct game g2;
+	for (i = 0; i < SIZE; ++i)
+	for (j = 0; j < SIZE; ++j)
+		g2.tiles[i][j] = g->tiles[j][i];
+	*g = g2;
 }
 
-int do_tick(int d)
+void flip(struct game* g)
 {
-    game.have_moved = 0;
-    do_gravity(d);
-    do_merge(d);
-    do_gravity(d);
-    return game.have_moved;
+	int i,j;
+	struct game g2;
+	for (i = 0; i < SIZE; ++i)
+	for (j = 0; j < SIZE; ++j)
+		g2.tiles[i][j] = g->tiles[i][SIZE - j - 1];
+	*g = g2;
 }
 
-void do_newblock(void) {
-    if (game.blocks_in_play >= 16) return;
-
-    int bn = rand() % (16 - game.blocks_in_play);
-    int pn = 0;
-
-    for (int x = 0; x < 4; ++x) {
-        for (int y = 0; y < 4; ++y) {
-            if (game.grid[x][y])
-                continue;
-
-            if (pn == bn){
-                game.grid[x][y] = rand() % 10 ? 1 : 2;
-                game.blocks_in_play += 1;
-                return;
-            }
-            else {
-                ++pn;
-            }
-        }
-    }
+void begin(struct game* g)
+{
+	struct game g2 = {};
+	*g = g2;
+	g->tiles[random_spot(g)][random_spot(g)] = random_value(g);
+	g->tiles[random_spot(g)][random_spot(g)] = random_value(g);
 }
 
-int main(void)
+void fall_column(int* a, int* b)
 {
-    /* Initialize terminal settings */
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+	int i,j;
+	int prev = 0;
+	j = 0;
+	for (i = 0; i < SIZE; ++i)
+		if (a[i]) {
+			if (a[i] == prev) {
+				b[j - 1] *= 2;
+				prev = 0;
+			} else {
+				b[j++] = a[i];
+				prev = a[i];
+			}
+		}
+}
 
-    srand(time(NULL));
-    memset(&game, 0, sizeof(game));
-    do_newblock();
-    do_newblock();
-    do_draw();
+void fall(struct game* g)
+{
+	struct game g2 = {};
+	int i;
+	for (i = 0; i < SIZE; ++i)
+		fall_column(g->tiles[i], g2.tiles[i]);
+	*g = g2;
+}
 
-    while (1) {
-        int found_valid_key, direction, value;
-        do {
-            found_valid_key = 1;
-            direction       = D_INVALID;
-            value           = getchar();
-            switch (value) {
-                case 'h': case 'a':
-                    direction = D_LEFT;
-                    break;
-                case 'l': case 'd':
-                    direction = D_RIGHT;
-                    break;
-                case 'j': case 's':
-                    direction = D_DOWN;
-                    break;
-                case 'k': case 'w':
-                    direction = D_UP;
-                    break;
-                case 'q':
-                    goto game_quit;
-                    break;
-                case 27:
-                    if (getchar() == 91) {
-                        value = getchar();
-                        switch (value) {
-                            case 65:
-                                direction = D_UP;
-                                break;
-                            case 66:
-                                direction = D_DOWN;
-                                break;
-                            case 67:
-                                direction = D_RIGHT;
-                                break;
-                            case 68:
-                                direction = D_LEFT;
-                                break;
-                            default:
-                                found_valid_key = 0;
-                                break;
-                        }
-                    }
-                    break;
-                default:
-                    found_valid_key = 0;
-                    break;
-            }
-        }  while (!found_valid_key);
+int same(struct game* a, struct game* b)
+{
+	int i,j;
+	for (i = 0; i < SIZE; ++i)
+	for (j = 0; j < SIZE; ++j)
+		if (a->tiles[i][j] != b->tiles[i][j])
+			return 0;
+	return 1;
+}
 
-        do_tick(direction);
-        if (game.have_moved != 0){
-                do_newblock();
-        }
-        do_draw();
+int tryfalling(struct game* g)
+{
+	struct game g2 = *g;
+	fall(g);
+	if (same(g, &g2))
+		return 0;
+	return 1;
+}
 
-        switch (do_check_end_condition()) {
-            case -1:
-                goto game_lose;
-            case 1:
-                goto game_win;
-            case 0:
-                break;
-        }
-    }
+void popup(struct game* g)
+{
+	int i,j;
+	while (1) {
+		i = random_spot(g);
+		j = random_spot(g);
+		if (!g->tiles[i][j]) {
+			g->tiles[i][j] = random_value(g);
+			return;
+		}
+	}
+}
 
-    if (0)
-game_lose:
-    printf("You lose!\n");
-    goto game_quit;
-    if (0)
-game_win:
-    printf("You win!\n");
-    goto game_quit;
-    if (0)
-game_quit:
+void move(struct game* g, int way)
+{
+	if (way / 2)
+		twist(g);
+	if (way % 2)
+		flip(g);
+	if (tryfalling(g))
+		popup(g);
+	if (way % 2)
+		flip(g);
+	if (way / 2)
+		twist(g);
+}
 
-    /* Restore terminal settings */
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-    return 0;
+int read_move(void)
+{
+	char keys[MOVES] = {'k','i','j','l'};
+	int c;
+	int i;
+	while (isspace(c = getchar()));
+	if (c == EOF)
+		return c;
+	for (i = 0; i < MOVES; ++i)
+		if (c == keys[i])
+			return i;
+	return EOF;
+}
+
+static struct termios backup;
+static struct termios current;
+
+void take_stdin(void)
+{
+	tcgetattr(STDIN_FILENO, &backup);
+	current = backup;
+	current.c_lflag &= (~ICANON & ~ECHO);
+	tcsetattr(STDIN_FILENO, TCSANOW, &current);
+}
+
+void give_stdin(void)
+{
+	tcsetattr(STDIN_FILENO, TCSANOW, &backup);
+}
+
+int main()
+{
+	int c;
+	struct game g;
+	begin(&g);
+	print(&g);
+	take_stdin();
+	while ((c = read_move()) != EOF) {
+		move(&g, c);
+		print(&g);
+	}
+	give_stdin();
+	return 0;
 }

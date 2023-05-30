@@ -1,7 +1,7 @@
 # 2048-in-every-programming-language
 trying to make 2048 in 2048 languages! feel free to add 2048 in every programming language that you know! 
 ## Languages
-we have written 2048 in 98 languages including the following:
+we have written 2048 in 99 languages including the following:
 ## A
 * [Aarch64 Assembly](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/A%202048%20programs/Aarch64%20Assembly%202048.s)
 * [ABAP](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/A%202048%20programs/ABAP%202048.abap)
@@ -9,6 +9,7 @@ we have written 2048 in 98 languages including the following:
 * [Ada](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/A%202048%20programs/Ada%202048.ads)
 * [ALGOL 68](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/A%202048%20programs/ALGOL%2068%202048.a68)
 * [Amazing Hopper](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/A%202048%20programs/Amazing%20Hopper%202048.h)
+* [AppleScript](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/A%202048%20programs/AppleScript%202048.scpt)
 * [Applesoft Basic](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/A%202048%20programs/Applesoft%20Basic%202048.bas)
 * [Arm Assembly](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/A%202048%20programs/Arm%20Assembly%202048.asm)
 * [AutoHotKey](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/A%202048%20programs/AutoHotKey%202048.ahk)

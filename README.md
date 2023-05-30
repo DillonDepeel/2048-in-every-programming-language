@@ -1,7 +1,7 @@
 # 2048-in-every-programming-language
 trying to make 2048 in 2048 languages! feel free to add 2048 in every programming language that you know! 
 ## Languages
-we have written 2048 in 97 languages including the following:
+we have written 2048 in 98 languages including the following:
 ## A
 * [Aarch64 Assembly](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/A%202048%20programs/Aarch64%20Assembly%202048.s)
 * [ABAP](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/A%202048%20programs/ABAP%202048.abap)
@@ -32,6 +32,7 @@ we have written 2048 in 97 languages including the following:
 * [D](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/D%202048%20Programs/D%202048.d)
 * [Dart](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/D%202048%20Programs/Dart%202048.dart)
 * [Delphi](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/D%202048%20Programs/Delphi%202048.bdsproj)
+* [DogeScript](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/D%202048%20Programs/DogeScript%202048.djs)
 ## E
 * [Elixir](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/E%202048%20Programs/Elixir%202048.exs)
 * [Elm](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/E%202048%20Programs/Elm%202048.elm)

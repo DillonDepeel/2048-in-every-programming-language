@@ -1,7 +1,7 @@
 # 2048-in-every-programming-language
 trying to make 2048 in 2048 languages! feel free to add 2048 in every programming language that you know! 
 ## Languages
-we have written 2048 in 96 languages including the following:
+we have written 2048 in 97 languages including the following:
 ## A
 * [Aarch64 Assembly](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/A%202048%20programs/Aarch64%20Assembly%202048.s)
 * [ABAP](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/A%202048%20programs/ABAP%202048.abap)
@@ -81,6 +81,7 @@ we have written 2048 in 96 languages including the following:
 * [PhiX](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/P%202048%20Programs/PhiX%202048.exw)
 * [PHP](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/P%202048%20Programs/PHP%202048.php)
 * [PicoLisp](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/P%202048%20Programs/PicoLisp%202048.l)
+* [PineScript](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/P%202048%20Programs/PineScript%202048.pine)
 * [Pony](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/P%202048%20Programs/Pony%202048.pony)
 * [Prolog](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/P%202048%20Programs/Prolog%202048.pl)
 * [Powershell](https://github.com/DillonDepeel/2048-in-every-programming-language/blob/main/P%202048%20Programs/Powershell%202048.ps1)

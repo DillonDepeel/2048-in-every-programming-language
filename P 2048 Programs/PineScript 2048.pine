@@ -1,0 +1,171 @@
+//@version=4
+study(title="2048 Game", overlay=true)
+
+// Tile object:
+Tile(pos, val, puzzle) =>
+    var col = round(pos % 4)
+    var row = floor(pos / 4)
+    var merging = false
+    
+    getCol() => col
+    getRow() => row
+    
+    // draw tile on a TradingView chart:
+    show() =>
+        var padding = merging ? 0 : 5
+        var size = 0.25*width
+        var hue = 10*(11 - log2(val))
+        var saturation = 50 + 15*log2(val)
+        var brightness = 200
+        var color = color.new(color.hsb2rgb(hue, saturation, brightness), 100)
+        var x = col*size + padding
+        var y = row*size + padding
+        var w = size - 2*padding
+        var h = size - 2*padding
+        var text_size = 0.1*width
+        var text_x = (col + 0.5)*size
+        var text_y = (row + 0.5)*size
+        
+        if (val > 0)
+            label.new(x, y, tostring(val), xloc.bar_center, yloc.bar_center, color, color, text_size, text.align_center)
+
+        bgcolor(color)
+        rect(x, y, w, h)
+    
+    // move tile in a given direction:
+    move(dir) =>
+        var col = getCol() + (1 - 2*(dir < 0))*abs(dir)%4
+        var row = getRow() + (1 - 2*(dir < 0))*floor(abs(dir)/4)
+        var target = puzzle.getTile(pos + dir)
+        
+        if (col < 0 or col > 3 or row < 0 or row > 3)
+            // target position out of bounds
+            false
+        else if (target)
+            // tile blocked by other tile
+            if (merging or target.merging or target.val != val)
+                false
+            else
+                // merge with target tile (equal values):
+                target.val += val
+                target.merging := true
+                puzzle.score += target.val
+                puzzle.removeTile(this)
+                true
+        else
+            // move tile:
+            pos += dir
+            true
+
+// Puzzle object:
+Puzzle() =>
+    var tiles = array.new_tile()
+    var dir = 0
+    var score = 0
+    var hasMoved = false
+    var validPositions = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+    
+    getOpenPositions() => array.filter(validPositions, i => array.indexof(array.map(tiles, x => x.pos), i) == -1)
+    getTile(pos) => array.find(tiles, x => x.pos == pos)
+    removeTile(tile) => array.remove(tiles, array.indexof(tiles, tile))
+    winCondition() => array.some(tiles, x => x.val == 2048)
+    
+    // check for valid moves:
+    validMoves() =>
+        // return true if there are empty spaces
+        if (array.size(tiles) < 16)
+            true
+        // otherwise check for neighboring tiles with the same value
+        var res = false
+        array.sort(tiles, (x, y) => x.pos - y.pos)
+        for i = 0 to 15
+            res := res or ( (i%4 < 3) ? tiles[i].val == tiles[i+1].val : false )
+                      or ( (i  < 12) ? tiles[i].val == tiles[i+4].val : false )
+        res
+    
+    // check win and lose condition:
+    checkGameState() =>
+        if (winCondition())
+            alert("You win!")
+        else if (not validMoves())
+            alert("You lose!")
+            restart()
+    
+    restart() =>
+        tiles := array.new_tile()
+        dir := 0
+        score := 0
+        hasMoved := false
+        generateTile()
+        generateTile()
+    
+    // draw the board on the TradingView chart:
+    show() =>
+        bgcolor(color.white)
+        label.new(0, 0, "SCORE: " + tostring(score), xloc.center, yloc.top, color.black, color.white, 14, text.align_center)
+        
+        for tile in tiles
+            tile.show()
+    
+    // update the board:
+    animate() =>
+        if (dir == 0)
+            return
+        
+        // move all tiles in a given direction
+        var moving = false
+        array.sort(tiles, (x, y) => dir*(y.pos - x.pos))
+        for tile in tiles
+            moving := moving or tile.move(dir)
+        
+        // check if the move is finished and generate a new tile
+        if (hasMoved and not moving)
+            dir := 0
+            generateTile()
+            
+            for tile in tiles
+                tile.merging := false
+        
+        hasMoved := moving
+    
+    generateTile() =>
+        var positions = getOpenPositions()
+        var pos = positions[math.floor(math.random()*array.size(positions))]
+        var val = 2 + 2*math.floor(math.random()*1.11)
+        array.push(tiles, Tile(pos, val, this))
+    
+    // process key inputs:
+    keyHandler(key) =>
+        if (key == 38) // UP_ARROW
+            dir := -4
+        else if (key == 40) // DOWN_ARROW
+            dir := 4
+        else if (key == 39) // RIGHT_ARROW
+            dir := 1
+        else if (key == 37) // LEFT_ARROW
+            dir := -1
+
+// initialize game:
+var game = Puzzle()
+
+// game loop:
+if barstate.islast
+    game.checkGameState()
+    game.animate()
+    game.show()
+
+// process key inputs:
+keyHandler(key) =>
+    game.keyHandler(key)
+    
+// bind key inputs:
+if barstate.islast
+    if (input.keyboard)
+        if (input.isKeyPressed(38)) // UP_ARROW
+            keyHandler(38)
+        else if (input.isKeyPressed(40)) // DOWN_ARROW
+            keyHandler(40)
+        else if (input.isKeyPressed(39)) // RIGHT_ARROW
+            keyHandler(39)
+        else if (input.isKeyPressed(37)) // LEFT_ARROW
+            keyHandler(37)
